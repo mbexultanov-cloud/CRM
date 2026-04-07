@@ -87,16 +87,16 @@ export default function StatsPage() {
 
   return (
     <main className="min-h-screen bg-[#0f0f0f]">
-      <header className="border-b border-[#2a2a2a] bg-[#0f0f0f] sticky top-0 z-40">
+        <header className="border-b border-[#2a2a2a] bg-[#0f0f0f] sticky top-0 z-40">
         <div className="flex items-center gap-3 px-6 py-4">
           <Link href="/" className="flex items-center gap-2 text-[#a1a1a1] hover:text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            BACK
           </Link>
           <div className="w-px h-6 bg-[#2a2a2a]" />
-          <h1 className="text-xl font-bold text-white">Statistics - Sales Pipeline</h1>
+          <h1 className="text-xl font-bold text-white">CRM STATS v4</h1>
         </div>
       </header>
 
