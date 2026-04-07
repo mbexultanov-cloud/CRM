@@ -13,6 +13,7 @@ interface NewDealModalProps {
 export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) {
   const [title, setTitle] = useState("");
   const [clientName, setClientName] = useState("");
+  const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [stageId, setStageId] = useState(stages[0]?.id ?? 1);
@@ -27,6 +28,7 @@ export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) 
       await createDeal({
         title,
         clientName,
+        phone: phone || undefined,
         amount: amount ? parseInt(amount) : undefined,
         description: description || undefined,
         stageId,
@@ -64,6 +66,16 @@ export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) 
               className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white placeholder-[#666]"
               placeholder="Client name"
               required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-[#a1a1a1]">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white placeholder-[#666]"
+              placeholder="+7 (999) 123-45-67"
             />
           </div>
           <div>

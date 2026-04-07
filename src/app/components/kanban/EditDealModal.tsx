@@ -14,6 +14,7 @@ interface EditDealModalProps {
 export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModalProps) {
   const [title, setTitle] = useState(deal.title);
   const [clientName, setClientName] = useState(deal.clientName);
+  const [phone, setPhone] = useState(deal.phone || "");
   const [amount, setAmount] = useState(deal.amount?.toString() || "");
   const [description, setDescription] = useState(deal.description || "");
   const [stageId, setStageId] = useState(deal.stageId);
@@ -29,6 +30,7 @@ export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModa
       await updateDeal(deal.id, {
         title,
         clientName,
+        phone: phone || undefined,
         amount: amount ? parseInt(amount) : undefined,
         description: description || undefined,
         stageId,
@@ -75,6 +77,16 @@ export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModa
               onChange={(e) => setClientName(e.target.value)}
               className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
               required
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm text-[#a1a1a1]">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+              placeholder="+7 (999) 123-45-67"
             />
           </div>
           <div>

@@ -15,6 +15,7 @@ export async function getDeals() {
 export async function createDeal(data: {
   title: string;
   clientName: string;
+  phone?: string;
   amount?: number;
   description?: string;
   stageId: number;
@@ -25,6 +26,7 @@ export async function createDeal(data: {
     .values({
       title: data.title,
       clientName: data.clientName,
+      phone: data.phone,
       amount: data.amount,
       description: data.description,
       stageId: data.stageId,
@@ -40,6 +42,7 @@ export async function updateDeal(
   data: {
     title?: string;
     clientName?: string;
+    phone?: string;
     amount?: number;
     description?: string;
     stageId?: number;

@@ -78,6 +78,9 @@ export function DealCard({ deal, stages, onMoveDeal, onEdit }: DealCardProps) {
         </div>
       </div>
       <p className="mb-2 text-sm text-[#a1a1a1]">{deal.clientName}</p>
+      {deal.phone && (
+        <p className="mb-2 text-sm text-[#6366f1]">{deal.phone}</p>
+      )}
       {deal.amount !== null && deal.amount !== undefined && (
         <p className="mb-2 font-semibold text-[#22c55e]">
           ${deal.amount.toLocaleString()}

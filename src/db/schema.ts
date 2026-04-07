@@ -12,6 +12,7 @@ export const deals = sqliteTable("deals", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   clientName: text("client_name").notNull(),
+  phone: text("phone"),
   amount: integer("amount"),
   description: text("description"),
   tags: text("tags"),
