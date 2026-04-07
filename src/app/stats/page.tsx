@@ -123,6 +123,12 @@ export default function StatsPage() {
           <div className="text-sm text-[#a1a1a1] pb-2">
             {filteredDeals.length} deals in selected period
           </div>
+          <button
+            onClick={() => { setDateFrom(""); setDateTo(""); }}
+            className="text-sm text-[#6366f1] hover:underline pb-2"
+          >
+            Clear dates
+          </button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
