@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Template",
-  description: "A minimal Next.js starter template",
+  title: "CRM Kanban",
+  description: "Sales pipeline management with Kanban board",
 };
 
 export default function RootLayout({
