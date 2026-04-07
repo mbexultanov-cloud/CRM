@@ -1,0 +1,22 @@
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+
+export const stages = sqliteTable("stages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  color: text("color").notNull(),
+  order: integer("order").notNull().default(0),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
+export const deals = sqliteTable("deals", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  clientName: text("client_name").notNull(),
+  amount: integer("amount"),
+  description: text("description"),
+  tags: text("tags"),
+  stageId: integer("stage_id").notNull().references(() => stages.id),
+  order: integer("order").notNull().default(0),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
