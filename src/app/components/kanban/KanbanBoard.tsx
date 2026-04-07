@@ -15,7 +15,7 @@ import {
 import { Stage, Deal } from "@/app/types";
 import { KanbanColumn } from "./KanbanColumn";
 import { DealCard } from "./DealCard";
-import { updateDeal } from "@/app/actions";
+import { updateDeal, updateStage } from "@/app/actions";
 
 interface KanbanBoardProps {
   stages: Stage[];
@@ -139,6 +139,16 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
     [localDeals]
   );
 
+  const handleUpdateStage = async (id: number, data: { name?: string; color?: string }) => {
+    try {
+      await updateStage(id, data);
+      // Force refresh to get updated data
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to update stage:", error);
+    }
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -155,6 +165,7 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
             deals={getDealsByStage(stage.id)}
             stages={stages}
             onMoveDeal={handleMoveDeal}
+            onUpdateStage={handleUpdateStage}
           />
         ))}
       </div>

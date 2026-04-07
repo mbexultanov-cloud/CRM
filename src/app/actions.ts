@@ -57,3 +57,19 @@ export async function updateDeal(
 export async function deleteDeal(id: number) {
   await db.delete(deals).where(eq(deals.id, id));
 }
+
+export async function updateStage(
+  id: number,
+  data: {
+    name?: string;
+    color?: string;
+    order?: number;
+  }
+) {
+  const [stage] = await db
+    .update(stages)
+    .set(data)
+    .where(eq(stages.id, id))
+    .returning();
+  return stage;
+}
