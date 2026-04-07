@@ -1,7 +1,6 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Stage, Deal } from "@/app/types";
 import { DealCard } from "./DealCard";
 
@@ -38,14 +37,9 @@ export function KanbanColumn({ stage, deals, stages, onMoveDeal }: KanbanColumnP
           isOver ? "bg-[#1a1a1a]/50 border-2 border-dashed border-[#3a3a3a]" : "bg-[#0f0f0f]"
         }`}
       >
-        <SortableContext
-          items={deals.map((d) => d.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {deals.map((deal) => (
-            <DealCard key={deal.id} deal={deal} stages={stages} onMoveDeal={onMoveDeal} />
-          ))}
-        </SortableContext>
+        {deals.map((deal) => (
+          <DealCard key={deal.id} deal={deal} stages={stages} onMoveDeal={onMoveDeal} />
+        ))}
         {deals.length === 0 && (
           <div className="flex h-[100px] items-center justify-center text-[#555] text-sm">
             No deals
