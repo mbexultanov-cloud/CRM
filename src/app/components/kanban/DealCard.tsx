@@ -1,7 +1,6 @@
 "use client";
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useDraggable } from "@dnd-kit/core";
 import { Deal, Stage } from "@/app/types";
 
 interface DealCardProps {
@@ -11,21 +10,10 @@ interface DealCardProps {
 }
 
 export function DealCard({ deal, stages, onMoveDeal }: DealCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: deal.id });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: deal.id,
+  });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const currentStage = stages.find(s => s.id === deal.stageId);
   const currentIndex = stages.findIndex(s => s.id === deal.stageId);
   const canMovePrev = currentIndex > 0;
   const canMoveNext = currentIndex < stages.length - 1;
@@ -33,11 +21,10 @@ export function DealCard({ deal, stages, onMoveDeal }: DealCardProps) {
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      {...attributes}
       {...listeners}
-      className={`group cursor-grab rounded-lg bg-[#1a1a1a] p-4 border border-[#2a2a2a] shadow-md transition-all hover:border-[#3a3a3a] active:cursor-grabbing ${
-        isDragging ? "opacity-80 rotate-2" : ""
+      {...attributes}
+      className={`cursor-grab rounded-lg bg-[#1a1a1a] p-4 border border-[#2a2a2a] shadow-md transition-all hover:border-[#3a3a3a] active:cursor-grabbing ${
+        isDragging ? "opacity-50" : ""
       }`}
     >
       <div className="flex items-start justify-between mb-2">
