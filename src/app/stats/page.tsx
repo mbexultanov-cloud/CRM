@@ -96,7 +96,7 @@ export default function StatsPage() {
             Back
           </Link>
           <div className="w-px h-6 bg-[#2a2a2a]" />
-          <h1 className="text-xl font-bold text-white">Statistics</h1>
+          <h1 className="text-xl font-bold text-white">Statistics - Sales Pipeline</h1>
         </div>
       </header>
 
