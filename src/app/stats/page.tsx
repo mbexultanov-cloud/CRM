@@ -101,34 +101,36 @@ export default function StatsPage() {
       </header>
 
       <div className="p-6 space-y-6">
-        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a] flex flex-wrap items-end gap-4">
-          <div>
-            <label className="block text-sm text-[#a1a1a1] mb-1">From</label>
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
-            />
+        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a] flex flex-col gap-4">
+          <div className="flex flex-wrap items-end gap-4">
+            <div>
+              <label className="block text-sm text-[#a1a1a1] mb-1">DATE FROM:</label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-[#a1a1a1] mb-1">DATE TO:</label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+              />
+            </div>
+            <button
+              onClick={() => { setDateFrom(""); setDateTo(""); }}
+              className="px-3 py-2 text-sm bg-[#6366f1] text-white rounded hover:bg-[#4f46e5]"
+            >
+              CLEAR DATES
+            </button>
           </div>
-          <div>
-            <label className="block text-sm text-[#a1a1a1] mb-1">To</label>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
-            />
+          <div className="text-sm text-[#22c55e] font-bold">
+            DEBUG: {filteredDeals.length} DEALS FOUND
           </div>
-          <div className="text-sm text-[#a1a1a1] pb-2">
-            {filteredDeals.length} deals in selected period
-          </div>
-          <button
-            onClick={() => { setDateFrom(""); setDateTo(""); }}
-            className="text-sm text-[#6366f1] hover:underline pb-2"
-          >
-            Clear dates
-          </button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
