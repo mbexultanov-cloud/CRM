@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Deal, Stage } from "@/app/types";
-import { updateDeal, deleteDeal } from "@/app/actions";
+import { useState, useEffect, useRef } from "react";
+import { Deal, Stage, Attachment } from "@/app/types";
+import { updateDeal, deleteDeal, getAttachments, deleteAttachment } from "@/app/actions";
 
 interface EditDealModalProps {
   deal: Deal;
@@ -20,6 +20,45 @@ export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModa
   const [stageId, setStageId] = useState(deal.stageId);
   const [loading, setLoading] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    getAttachments(deal.id).then(setAttachments);
+  }, [deal.id]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("dealId", deal.id.toString());
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const newAttachment = await res.json();
+        setAttachments((prev) => [...prev, newAttachment]);
+      }
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeleteAttachment = async (id: number) => {
+    await deleteAttachment(id);
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +92,12 @@ export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModa
     }
   };
 
+  const isImage = (type?: string | null) => type?.startsWith("image/");
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-md rounded-lg bg-[#1a1a1a] p-6 border border-[#2a2a2a]">
+      <div className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg bg-[#1a1a1a] p-6 border border-[#2a2a2a]">
         <h2 className="mb-4 text-xl font-semibold text-white">Edit Deal</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -121,6 +162,54 @@ export function EditDealModal({ deal, stages, onClose, onSuccess }: EditDealModa
               rows={3}
             />
           </div>
+
+          <div>
+            <label className="mb-1 block text-sm text-[#a1a1a1]">Attachments</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-[#22c55e] file:text-white file:cursor-pointer"
+            />
+            {uploading && <p className="text-sm text-[#a1a1a1] mt-1">Uploading...</p>}
+          </div>
+
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {attachments.map((att) => (
+                <div key={att.id} className="relative group">
+                  {isImage(att.fileType) ? (
+                    <a
+                      href={att.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-16 h-16 rounded overflow-hidden border border-[#2a2a2a]"
+                    >
+                      <img src={att.fileUrl} alt={att.fileName} className="w-full h-full object-cover" />
+                    </a>
+                  ) : (
+                    <a
+                      href={att.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    className="flex items-center justify-center w-16 h-16 rounded border border-[#2a2a2a] text-xs text-[#a1a1a1] bg-[#252525]"
+                  >
+                    {att.fileName?.substring(0, 10) || 'file'}...
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteAttachment(att.id)}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-[#ef4444] rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="flex gap-3 pt-2">
             <button
               type="button"

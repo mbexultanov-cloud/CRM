@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { deals, stages } from "@/db/schema";
+import { deals, stages, attachments } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
 export async function getStages() {
@@ -75,4 +75,26 @@ export async function updateStage(
     .where(eq(stages.id, id))
     .returning();
   return stage;
+}
+
+export async function getAttachments(dealId: number) {
+  return db.select().from(attachments).where(eq(attachments.dealId, dealId));
+}
+
+export async function createAttachment(data: {
+  dealId: number;
+  fileName: string;
+  fileUrl: string;
+  fileType?: string;
+  fileSize?: number;
+}) {
+  const [attachment] = await db
+    .insert(attachments)
+    .values(data)
+    .returning();
+  return attachment;
+}
+
+export async function deleteAttachment(id: number) {
+  await db.delete(attachments).where(eq(attachments.id, id));
 }

@@ -15,6 +15,13 @@
       "when": 1775590561532,
       "tag": "0001_closed_frog_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775591894559,
+      "tag": "0002_outstanding_rachel_grey",
+      "breakpoints": true
     }
   ]
 }
