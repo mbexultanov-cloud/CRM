@@ -1,38 +1,89 @@
-import { getStages, getDeals } from "@/app/actions";
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { db } from "@/db";
-import { deals } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { Stage, Deal } from "@/app/types";
+import { getStages, getDeals } from "@/app/actions";
 
-export default async function StatsPage() {
-  const stagesData = await getStages();
-  const dealsData = await getDeals();
+export default function StatsPage() {
+  const [stages, setStages] = useState<Stage[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  const totalDeals = dealsData.length;
-  const totalAmount = dealsData.reduce((sum, d) => sum + (d.amount || 0), 0);
+  useEffect(() => {
+    async function load() {
+      const [stagesData, dealsData] = await Promise.all([
+        getStages(),
+        getDeals(),
+      ]);
+      setStages(stagesData);
+      setDeals(dealsData);
+      
+      const today = new Date();
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      setDateTo(today.toISOString().split("T")[0]);
+      setDateFrom(monthAgo.toISOString().split("T")[0]);
+      
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  const filteredDeals = deals.filter((deal) => {
+    const dealDate = deal.createdAt ? new Date(deal.createdAt) : null;
+    if (!dealDate) return true;
+    
+    let fromOk = true;
+    let toOk = true;
+    
+    if (dateFrom) {
+      fromOk = dealDate >= new Date(dateFrom);
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59);
+      toOk = dealDate <= toDate;
+    }
+    
+    return fromOk && toOk;
+  });
+
+  const totalDeals = filteredDeals.length;
+  const totalAmount = filteredDeals.reduce((sum, d) => sum + (d.amount || 0), 0);
   
-  const wonDeals = dealsData.filter(d => {
-    const stage = stagesData.find(s => s.id === d.stageId);
+  const wonDeals = filteredDeals.filter(d => {
+    const stage = stages.find(s => s.id === d.stageId);
     return stage?.name === "Won";
   });
   const wonAmount = wonDeals.reduce((sum, d) => sum + (d.amount || 0), 0);
   
-  const lostDeals = dealsData.filter(d => {
-    const stage = stagesData.find(s => s.id === d.stageId);
+  const lostDeals = filteredDeals.filter(d => {
+    const stage = stages.find(s => s.id === d.stageId);
     return stage?.name === "Lost";
   });
   const lostAmount = lostDeals.reduce((sum, d) => sum + (d.amount || 0), 0);
 
-  const dealsByStage = stagesData.map(stage => ({
+  const dealsByStage = stages.map(stage => ({
     name: stage.name,
     color: stage.color,
-    count: dealsData.filter(d => d.stageId === stage.id).length,
-    amount: dealsData
+    count: filteredDeals.filter(d => d.stageId === stage.id).length,
+    amount: filteredDeals
       .filter(d => d.stageId === stage.id)
       .reduce((sum, d) => sum + (d.amount || 0), 0),
   }));
 
   const conversionRate = totalDeals > 0 ? Math.round((wonDeals.length / totalDeals) * 100) : 0;
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <div className="text-[#a1a1a1]">Loading...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#0f0f0f]">
@@ -50,6 +101,30 @@ export default async function StatsPage() {
       </header>
 
       <div className="p-6 space-y-6">
+        <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[#2a2a2a] flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-sm text-[#a1a1a1] mb-1">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-[#a1a1a1] mb-1">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+            />
+          </div>
+          <div className="text-sm text-[#a1a1a1] pb-2">
+            {filteredDeals.length} deals in selected period
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#2a2a2a]">
             <p className="text-sm text-[#a1a1a1] mb-1">Total Deals</p>
