@@ -66,12 +66,20 @@ export default function Home() {
             </div>
             <h1 className="text-xl font-bold text-white">CRM Kanban</h1>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="rounded-lg bg-[#22c55e] px-4 py-2 font-medium text-white hover:bg-[#16a34a]"
-          >
-            + New Deal
-          </button>
+          <div className="flex items-center gap-3">
+            <a
+              href="/stats"
+              className="rounded-lg border border-[#2a2a2a] px-4 py-2 text-[#a1a1a1] hover:text-white hover:border-[#3a3a3a]"
+            >
+              Stats
+            </a>
+            <button
+              onClick={() => setShowModal(true)}
+              className="rounded-lg bg-[#22c55e] px-4 py-2 font-medium text-white hover:bg-[#16a34a]"
+            >
+              + New Deal
+            </button>
+          </div>
         </div>
       </header>
 
