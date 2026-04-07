@@ -162,26 +162,30 @@ export default function StatsPage() {
         <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#2a2a2a]">
           <h2 className="text-lg font-semibold text-white mb-4">Deals by Stage</h2>
           <div className="space-y-3">
-            {dealsByStage.map((stage) => (
-              <div key={stage.name} className="flex items-center gap-3">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: stage.color }}
-                />
-                <span className="w-32 text-white">{stage.name}</span>
-                <div className="flex-1 h-2 bg-[#252525] rounded-full overflow-hidden">
+            {dealsByStage.map((stage) => {
+              const stagePercent = totalDeals > 0 ? Math.round((stage.count / totalDeals) * 100) : 0;
+              return (
+                <div key={stage.name} className="flex items-center gap-3">
                   <div
-                    className="h-full transition-all"
-                    style={{
-                      width: `${totalDeals > 0 ? (stage.count / totalDeals) * 100 : 0}%`,
-                      backgroundColor: stage.color,
-                    }}
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: stage.color }}
                   />
+                  <span className="w-32 text-white">{stage.name}</span>
+                  <div className="flex-1 h-2 bg-[#252525] rounded-full overflow-hidden">
+                    <div
+                      className="h-full transition-all"
+                      style={{
+                        width: `${stagePercent}%`,
+                        backgroundColor: stage.color,
+                      }}
+                    />
+                  </div>
+                  <span className="w-12 text-right text-[#a1a1a1]">{stage.count}</span>
+                  <span className="w-16 text-right text-[#6366f1]">{stagePercent}%</span>
+                  <span className="w-24 text-right text-[#22c55e]">${stage.amount.toLocaleString()}</span>
                 </div>
-                <span className="w-16 text-right text-[#a1a1a1]">{stage.count}</span>
-                <span className="w-24 text-right text-[#22c55e]">${stage.amount.toLocaleString()}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
