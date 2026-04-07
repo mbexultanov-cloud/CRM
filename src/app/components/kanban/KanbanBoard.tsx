@@ -12,7 +12,6 @@ import {
   closestCorners,
   DragOverlay,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 import { Stage, Deal } from "@/app/types";
 import { KanbanColumn } from "./KanbanColumn";
 import { DealCard } from "./DealCard";
@@ -30,17 +29,9 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 0,
       },
     })
-  );
-
-  const findStageByDealId = useCallback(
-    (dealId: number) => {
-      const deal = localDeals.find((d) => d.id === dealId);
-      return deal ? stages.find((s) => s.id === deal.stageId) : null;
-    },
-    [localDeals, stages]
   );
 
   const handleDragStart = (event: DragStartEvent) => {
