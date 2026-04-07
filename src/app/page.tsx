@@ -12,7 +12,6 @@ export default function Home() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
 
   useEffect(() => {
@@ -26,10 +25,15 @@ export default function Home() {
       setLoading(false);
     }
     load();
-  }, [refreshKey]);
+  }, []);
 
-  const handleSuccess = () => {
-    setRefreshKey((k) => k + 1);
+  const refreshData = async () => {
+    const [stagesData, dealsData] = await Promise.all([
+      getStages(),
+      getDeals(),
+    ]);
+    setStages(stagesData);
+    setDeals(dealsData);
   };
 
   if (loading) {
@@ -94,7 +98,7 @@ export default function Home() {
         <NewDealModal
           stages={stages}
           onClose={() => setShowModal(false)}
-          onSuccess={handleSuccess}
+          onSuccess={refreshData}
         />
       )}
 
@@ -103,7 +107,7 @@ export default function Home() {
           deal={editingDeal}
           stages={stages}
           onClose={() => setEditingDeal(null)}
-          onSuccess={handleSuccess}
+          onSuccess={refreshData}
         />
       )}
     </main>
