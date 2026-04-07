@@ -166,7 +166,7 @@ export default function StatsPage() {
         </div>
 
         <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#2a2a2a]">
-          <h2 className="text-lg font-semibold text-white mb-4">Deals by Stage</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">Deals by Stage - Pipeline</h2>
           <div className="space-y-3">
             {dealsByStage.map((stage) => {
               const stagePercent = totalDeals > 0 ? Math.round((stage.count / totalDeals) * 100) : 0;
