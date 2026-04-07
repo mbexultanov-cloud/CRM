@@ -8,9 +8,11 @@ import { DealCard } from "./DealCard";
 interface KanbanColumnProps {
   stage: Stage;
   deals: Deal[];
+  stages: Stage[];
+  onMoveDeal: (dealId: number, direction: 'next' | 'prev') => void;
 }
 
-export function KanbanColumn({ stage, deals }: KanbanColumnProps) {
+export function KanbanColumn({ stage, deals, stages, onMoveDeal }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: stage.id,
   });
@@ -41,7 +43,7 @@ export function KanbanColumn({ stage, deals }: KanbanColumnProps) {
           strategy={verticalListSortingStrategy}
         >
           {deals.map((deal) => (
-            <DealCard key={deal.id} deal={deal} />
+            <DealCard key={deal.id} deal={deal} stages={stages} onMoveDeal={onMoveDeal} />
           ))}
         </SortableContext>
         {deals.length === 0 && (

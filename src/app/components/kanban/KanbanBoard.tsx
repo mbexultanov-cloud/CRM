@@ -120,6 +120,27 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
     }
   };
 
+  const handleMoveDeal = async (dealId: number, direction: 'next' | 'prev') => {
+    const deal = localDeals.find(d => d.id === dealId);
+    if (!deal) return;
+
+    const currentIndex = stages.findIndex(s => s.id === deal.stageId);
+    const newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+
+    if (newIndex < 0 || newIndex >= stages.length) return;
+
+    const newStage = stages[newIndex];
+
+    try {
+      await updateDeal(dealId, { stageId: newStage.id });
+      setLocalDeals(prev =>
+        prev.map(d => d.id === dealId ? { ...d, stageId: newStage.id } : d)
+      );
+    } catch (error) {
+      console.error("Failed to move deal:", error);
+    }
+  };
+
   const getDealsByStage = useCallback(
     (stageId: number) => {
       return localDeals.filter((d) => d.stageId === stageId);
@@ -141,11 +162,13 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
             key={stage.id}
             stage={stage}
             deals={getDealsByStage(stage.id)}
+            stages={stages}
+            onMoveDeal={handleMoveDeal}
           />
         ))}
       </div>
       <DragOverlay>
-        {activeDeal ? <DealCard deal={activeDeal} /> : null}
+        {activeDeal ? <DealCard deal={activeDeal} stages={stages} onMoveDeal={() => {}} /> : null}
       </DragOverlay>
     </DndContext>
   );
