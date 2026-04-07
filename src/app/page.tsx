@@ -13,6 +13,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
+  const [timeFilter, setTimeFilter] = useState<string>("all");
 
   useEffect(() => {
     async function load() {
@@ -26,6 +27,35 @@ export default function Home() {
     }
     load();
   }, []);
+
+  const filteredDeals = deals.filter((deal) => {
+    if (timeFilter === "all") return true;
+    
+    const dealDate = deal.createdAt ? new Date(deal.createdAt) : null;
+    if (!dealDate) return true;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    switch (timeFilter) {
+      case "today":
+        return dealDate >= today;
+      case "week":
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return dealDate >= weekAgo;
+      case "month":
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        return dealDate >= monthAgo;
+      case "year":
+        const yearAgo = new Date(today);
+        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+        return dealDate >= yearAgo;
+      default:
+        return true;
+    }
+  });
 
   const refreshData = async () => {
     const [stagesData, dealsData] = await Promise.all([
@@ -67,6 +97,17 @@ export default function Home() {
             <h1 className="text-xl font-bold text-white">CRM Kanban</h1>
           </div>
           <div className="flex items-center gap-3">
+            <select
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-white text-sm"
+            >
+              <option value="all">All time</option>
+              <option value="today">Today</option>
+              <option value="week">This week</option>
+              <option value="month">This month</option>
+              <option value="year">This year</option>
+            </select>
             <a
               href="/stats"
               className="rounded-lg border border-[#2a2a2a] px-4 py-2 text-[#a1a1a1] hover:text-white hover:border-[#3a3a3a]"
@@ -96,7 +137,7 @@ export default function Home() {
         ) : (
           <KanbanBoard 
             stages={stages} 
-            deals={deals} 
+            deals={filteredDeals} 
             onEditDeal={setEditingDeal}
           />
         )}
