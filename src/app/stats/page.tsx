@@ -96,7 +96,7 @@ export default function StatsPage() {
             BACK
           </Link>
           <div className="w-px h-6 bg-[#2a2a2a]" />
-          <h1 className="text-xl font-bold text-white">CRM STATS v4</h1>
+          <h1 className="text-xl font-bold text-white">CRM STATS v5 - UPDATED</h1>
         </div>
       </header>
 
