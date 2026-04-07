@@ -77,6 +77,20 @@ export async function updateStage(
   return stage;
 }
 
+export async function createStage(data: { name: string; color: string }) {
+  const maxOrder = await db.select({ max: stages.order }).from(stages).then(r => r[0]?.max || 0);
+  const [stage] = await db.insert(stages).values({
+    name: data.name,
+    color: data.color,
+    order: maxOrder + 1,
+  }).returning();
+  return stage;
+}
+
+export async function deleteStage(id: number) {
+  await db.delete(stages).where(eq(stages.id, id));
+}
+
 export async function getAttachments(dealId: number) {
   return db.select().from(attachments).where(eq(attachments.dealId, dealId));
 }

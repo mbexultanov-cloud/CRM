@@ -6,6 +6,7 @@ import { getStages, getDeals } from "@/app/actions";
 import { KanbanBoard } from "./components/kanban/KanbanBoard";
 import { NewDealModal } from "./components/kanban/NewDealModal";
 import { EditDealModal } from "./components/kanban/EditDealModal";
+import { StageManager } from "./components/kanban/StageManager";
 
 export default function Home() {
   const [stages, setStages] = useState<Stage[]>([]);
@@ -14,6 +15,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [timeFilter, setTimeFilter] = useState<string>("all");
+  const [showStages, setShowStages] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -115,6 +117,12 @@ export default function Home() {
               Stats
             </a>
             <button
+              onClick={() => setShowStages(!showStages)}
+              className="rounded-lg bg-[#6366f1] px-4 py-2 text-white font-medium"
+            >
+              Stages ({stages.length})
+            </button>
+            <button
               onClick={() => setShowModal(true)}
               className="rounded-lg bg-[#22c55e] px-4 py-2 font-medium text-white hover:bg-[#16a34a]"
             >
@@ -125,6 +133,11 @@ export default function Home() {
       </header>
 
       <div className="p-6">
+        {showStages && (
+          <div className="mb-6 p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
+            <StageManager stages={stages} onUpdate={refreshData} />
+          </div>
+        )}
         {stages.length === 0 ? (
           <div className="flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed border-[#2a2a2a]">
             <div className="text-center">
