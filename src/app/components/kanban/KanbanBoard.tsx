@@ -10,7 +10,7 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
-  closestCenter,
+  rectIntersection,
 } from "@dnd-kit/core";
 import { Stage, Deal } from "@/app/types";
 import { KanbanColumn } from "./KanbanColumn";
@@ -142,7 +142,7 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={rectIntersection}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
