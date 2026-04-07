@@ -7,9 +7,10 @@ interface DealCardProps {
   deal: Deal;
   stages: Stage[];
   onMoveDeal: (dealId: number, direction: 'next' | 'prev') => void;
+  onEdit: (deal: Deal) => void;
 }
 
-export function DealCard({ deal, stages, onMoveDeal }: DealCardProps) {
+export function DealCard({ deal, stages, onMoveDeal, onEdit }: DealCardProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: deal.id,
   });
@@ -23,13 +24,27 @@ export function DealCard({ deal, stages, onMoveDeal }: DealCardProps) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`cursor-grab rounded-lg bg-[#1a1a1a] p-4 border border-[#2a2a2a] shadow-md transition-all hover:border-[#3a3a3a] active:cursor-grabbing ${
+      onDoubleClick={() => onEdit(deal)}
+      className={`cursor-grab rounded-lg bg-[#1a1a1a] p-4 border border-[#2a2a2a] shadow-md transition-all hover:border-[#3a3a3a] active:cursor-grabbing group ${
         isDragging ? "opacity-50" : ""
       }`}
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="font-medium text-white truncate flex-1">{deal.title}</h3>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(deal);
+            }}
+            className="p-1 rounded hover:bg-[#252525] transition-colors"
+            title="Edit deal"
+          >
+            <svg className="w-3 h-3 text-[#a1a1a1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
           {canMovePrev && (
             <button
               onPointerDown={(e) => e.stopPropagation()}

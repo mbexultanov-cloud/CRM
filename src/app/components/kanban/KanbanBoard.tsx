@@ -20,9 +20,10 @@ import { updateDeal, updateStage } from "@/app/actions";
 interface KanbanBoardProps {
   stages: Stage[];
   deals: Deal[];
+  onEditDeal: (deal: Deal) => void;
 }
 
-export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
+export function KanbanBoard({ stages, deals, onEditDeal }: KanbanBoardProps) {
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
   const [localDeals, setLocalDeals] = useState(deals);
 
@@ -142,7 +143,6 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
   const handleUpdateStage = async (id: number, data: { name?: string; color?: string }) => {
     try {
       await updateStage(id, data);
-      // Force refresh to get updated data
       window.location.reload();
     } catch (error) {
       console.error("Failed to update stage:", error);
@@ -166,11 +166,12 @@ export function KanbanBoard({ stages, deals }: KanbanBoardProps) {
             stages={stages}
             onMoveDeal={handleMoveDeal}
             onUpdateStage={handleUpdateStage}
+            onEditDeal={onEditDeal}
           />
         ))}
       </div>
       <DragOverlay>
-        {activeDeal ? <DealCard deal={activeDeal} stages={stages} onMoveDeal={() => {}} /> : null}
+        {activeDeal ? <DealCard deal={activeDeal} stages={stages} onMoveDeal={() => {}} onEdit={() => {}} /> : null}
       </DragOverlay>
     </DndContext>
   );

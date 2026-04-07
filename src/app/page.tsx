@@ -5,6 +5,7 @@ import { Stage, Deal } from "@/app/types";
 import { getStages, getDeals } from "@/app/actions";
 import { KanbanBoard } from "./components/kanban/KanbanBoard";
 import { NewDealModal } from "./components/kanban/NewDealModal";
+import { EditDealModal } from "./components/kanban/EditDealModal";
 
 export default function Home() {
   const [stages, setStages] = useState<Stage[]>([]);
@@ -12,6 +13,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -80,7 +82,11 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <KanbanBoard stages={stages} deals={deals} />
+          <KanbanBoard 
+            stages={stages} 
+            deals={deals} 
+            onEditDeal={setEditingDeal}
+          />
         )}
       </div>
 
@@ -88,6 +94,15 @@ export default function Home() {
         <NewDealModal
           stages={stages}
           onClose={() => setShowModal(false)}
+          onSuccess={handleSuccess}
+        />
+      )}
+
+      {editingDeal && (
+        <EditDealModal
+          deal={editingDeal}
+          stages={stages}
+          onClose={() => setEditingDeal(null)}
           onSuccess={handleSuccess}
         />
       )}

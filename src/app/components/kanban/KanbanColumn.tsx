@@ -11,9 +11,10 @@ interface KanbanColumnProps {
   stages: Stage[];
   onMoveDeal: (dealId: number, direction: 'next' | 'prev') => void;
   onUpdateStage: (id: number, data: { name?: string; color?: string }) => void;
+  onEditDeal: (deal: Deal) => void;
 }
 
-export function KanbanColumn({ stage, deals, stages, onMoveDeal, onUpdateStage }: KanbanColumnProps) {
+export function KanbanColumn({ stage, deals, stages, onMoveDeal, onUpdateStage, onEditDeal }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: stage.id,
   });
@@ -78,7 +79,7 @@ export function KanbanColumn({ stage, deals, stages, onMoveDeal, onUpdateStage }
         }`}
       >
         {deals.map((deal) => (
-          <DealCard key={deal.id} deal={deal} stages={stages} onMoveDeal={onMoveDeal} />
+          <DealCard key={deal.id} deal={deal} stages={stages} onMoveDeal={onMoveDeal} onEdit={onEditDeal} />
         ))}
         {deals.length === 0 && (
           <div className="flex h-[100px] items-center justify-center text-[#555] text-sm">
