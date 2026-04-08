@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Stage, Deal, User } from "@/app/types";
 import { getStages, getDeals, getUsers } from "@/app/actions";
 import { KanbanBoard } from "./components/kanban/KanbanBoard";
+import { CalendarView } from "./components/kanban/CalendarView";
 import { NewDealModal } from "./components/kanban/NewDealModal";
 import { EditDealModal } from "./components/kanban/EditDealModal";
 import { StageManager } from "./components/kanban/StageManager";
@@ -19,6 +20,7 @@ export default function Home() {
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [showStages, setShowStages] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [viewMode, setViewMode] = useState<"kanban" | "calendar">("kanban");
 
   useEffect(() => {
     async function load() {
@@ -117,6 +119,20 @@ export default function Home() {
               <option value="month">This month</option>
               <option value="year">This year</option>
             </select>
+            <div className="flex rounded-lg border border-[#2a2a2a] overflow-hidden">
+              <button
+                onClick={() => setViewMode("kanban")}
+                className={`px-3 py-2 text-sm ${viewMode === "kanban" ? "bg-[#22c55e] text-white" : "bg-[#1a1a1a] text-[#a1a1a1] hover:text-white"}`}
+              >
+                Kanban
+              </button>
+              <button
+                onClick={() => setViewMode("calendar")}
+                className={`px-3 py-2 text-sm ${viewMode === "calendar" ? "bg-[#22c55e] text-white" : "bg-[#1a1a1a] text-[#a1a1a1] hover:text-white"}`}
+              >
+                Calendar
+              </button>
+            </div>
             <a
               href="/stats"
               className="rounded-lg border border-[#2a2a2a] px-4 py-2 text-[#a1a1a1] hover:text-white hover:border-[#3a3a3a]"
@@ -165,6 +181,13 @@ export default function Home() {
               </p>
             </div>
           </div>
+        ) : viewMode === "calendar" ? (
+          <CalendarView
+            deals={filteredDeals}
+            stages={stages}
+            users={users}
+            onEditDeal={setEditingDeal}
+          />
         ) : (
           <KanbanBoard 
             stages={stages} 

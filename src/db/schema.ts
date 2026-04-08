@@ -26,6 +26,7 @@ export const deals = sqliteTable("deals", {
   tags: text("tags"),
   stageId: integer("stage_id").notNull().references(() => stages.id),
   userId: integer("user_id").references(() => users.id),
+  dueDate: integer("due_date", { mode: "timestamp" }),
   order: integer("order").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),

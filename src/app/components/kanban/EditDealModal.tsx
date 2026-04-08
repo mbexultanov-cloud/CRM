@@ -20,6 +20,7 @@ export function EditDealModal({ deal, stages, users, onClose, onSuccess }: EditD
   const [description, setDescription] = useState(deal.description || "");
   const [stageId, setStageId] = useState(deal.stageId);
   const [userId, setUserId] = useState<number | undefined>(deal.userId ?? undefined);
+  const [dueDate, setDueDate] = useState(deal.dueDate ? new Date(deal.dueDate).toISOString().split('T')[0] : "");
   const [loading, setLoading] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -76,6 +77,7 @@ export function EditDealModal({ deal, stages, users, onClose, onSuccess }: EditD
         description: description || undefined,
         stageId,
         userId,
+        dueDate: dueDate ? new Date(dueDate) : null,
       });
       onSuccess();
       onClose();
@@ -173,6 +175,15 @@ export function EditDealModal({ deal, stages, users, onClose, onSuccess }: EditD
               </select>
             </div>
           )}
+          <div>
+            <label className="mb-1 block text-sm text-[#a1a1a1]">Due Date</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+            />
+          </div>
           <div>
             <label className="mb-1 block text-sm text-[#a1a1a1]">Description</label>
             <textarea

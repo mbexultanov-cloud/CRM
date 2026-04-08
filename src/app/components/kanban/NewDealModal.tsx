@@ -19,6 +19,7 @@ export function NewDealModal({ stages, users, onClose, onSuccess }: NewDealModal
   const [description, setDescription] = useState("");
   const [stageId, setStageId] = useState(stages[0]?.id ?? 1);
   const [userId, setUserId] = useState<number | undefined>();
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,6 +36,7 @@ export function NewDealModal({ stages, users, onClose, onSuccess }: NewDealModal
         description: description || undefined,
         stageId,
         userId,
+        dueDate: dueDate ? new Date(dueDate) : undefined,
       });
       onSuccess();
       onClose();
@@ -119,9 +121,18 @@ export function NewDealModal({ stages, users, onClose, onSuccess }: NewDealModal
                     {user.name}
                   </option>
                 ))}
-              </select>
-            </div>
+            </select>
+          </div>
           )}
+          <div>
+            <label className="mb-1 block text-sm text-[#a1a1a1]">Due Date</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+            />
+          </div>
           <div>
             <label className="mb-1 block text-sm text-[#a1a1a1]">Description</label>
             <textarea
