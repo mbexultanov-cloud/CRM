@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { deals, stages, attachments } from "@/db/schema";
+import { deals, stages, attachments, users } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
 export async function getStages() {
@@ -10,6 +10,23 @@ export async function getStages() {
 
 export async function getDeals() {
   return db.select().from(deals).orderBy(asc(deals.order));
+}
+
+export async function getUsers() {
+  return db.select().from(users);
+}
+
+export async function createUser(data: { name: string; email: string; role?: string }) {
+  const [user] = await db.insert(users).values({
+    name: data.name,
+    email: data.email,
+    role: data.role || "user",
+  }).returning();
+  return user;
+}
+
+export async function deleteUser(id: number) {
+  await db.delete(users).where(eq(users.id, id));
 }
 
 export async function createDeal(data: {

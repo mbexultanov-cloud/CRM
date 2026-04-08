@@ -1,30 +1,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Stage, Deal } from "@/app/types";
-import { getStages, getDeals } from "@/app/actions";
+import { Stage, Deal, User } from "@/app/types";
+import { getStages, getDeals, getUsers } from "@/app/actions";
 import { KanbanBoard } from "./components/kanban/KanbanBoard";
 import { NewDealModal } from "./components/kanban/NewDealModal";
 import { EditDealModal } from "./components/kanban/EditDealModal";
 import { StageManager } from "./components/kanban/StageManager";
+import { UserManager } from "./components/kanban/UserManager";
 
 export default function Home() {
   const [stages, setStages] = useState<Stage[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [showStages, setShowStages] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const [stagesData, dealsData] = await Promise.all([
+      const [stagesData, dealsData, usersData] = await Promise.all([
         getStages(),
         getDeals(),
+        getUsers(),
       ]);
       setStages(stagesData);
       setDeals(dealsData);
+      setUsers(usersData);
       setLoading(false);
     }
     load();
@@ -60,12 +65,14 @@ export default function Home() {
   });
 
   const refreshData = async () => {
-    const [stagesData, dealsData] = await Promise.all([
+    const [stagesData, dealsData, usersData] = await Promise.all([
       getStages(),
       getDeals(),
+      getUsers(),
     ]);
     setStages(stagesData);
     setDeals(dealsData);
+    setUsers(usersData);
   };
 
   if (loading) {
@@ -123,6 +130,12 @@ export default function Home() {
               Stages ({stages.length})
             </button>
             <button
+              onClick={() => setShowUsers(!showUsers)}
+              className="rounded-lg bg-[#8b5cf6] px-4 py-2 text-white font-medium"
+            >
+              Users ({users.length})
+            </button>
+            <button
               onClick={() => setShowModal(true)}
               className="rounded-lg bg-[#22c55e] px-4 py-2 font-medium text-white hover:bg-[#16a34a]"
             >
@@ -136,6 +149,11 @@ export default function Home() {
         {showStages && (
           <div className="mb-6 p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
             <StageManager stages={stages} onUpdate={refreshData} />
+          </div>
+        )}
+        {showUsers && (
+          <div className="mb-6 p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
+            <UserManager users={users} onUpdate={refreshData} />
           </div>
         )}
         {stages.length === 0 ? (
