@@ -2,21 +2,23 @@
 
 import { useState } from "react";
 import { createDeal } from "@/app/actions";
-import { Stage } from "@/app/types";
+import { Stage, User } from "@/app/types";
 
 interface NewDealModalProps {
   stages: Stage[];
+  users: User[];
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) {
+export function NewDealModal({ stages, users, onClose, onSuccess }: NewDealModalProps) {
   const [title, setTitle] = useState("");
   const [clientName, setClientName] = useState("");
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [stageId, setStageId] = useState(stages[0]?.id ?? 1);
+  const [userId, setUserId] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,6 +34,7 @@ export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) 
         amount: amount ? parseInt(amount) : undefined,
         description: description || undefined,
         stageId,
+        userId,
       });
       onSuccess();
       onClose();
@@ -102,6 +105,23 @@ export function NewDealModal({ stages, onClose, onSuccess }: NewDealModalProps) 
               ))}
             </select>
           </div>
+          {users.length > 0 && (
+            <div>
+              <label className="mb-1 block text-sm text-[#a1a1a1]">Assigned User</label>
+              <select
+                value={userId ?? ""}
+                onChange={(e) => setUserId(e.target.value ? parseInt(e.target.value) : undefined)}
+                className="w-full rounded-md bg-[#252525] border border-[#2a2a2a] px-3 py-2 text-white"
+              >
+                <option value="">Select user...</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-sm text-[#a1a1a1]">Description</label>
             <textarea

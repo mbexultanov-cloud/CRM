@@ -2,24 +2,27 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Stage, Deal } from "@/app/types";
-import { getStages, getDeals } from "@/app/actions";
+import { Stage, Deal, User } from "@/app/types";
+import { getStages, getDeals, getUsers } from "@/app/actions";
 
 export default function StatsPage() {
   const [stages, setStages] = useState<Stage[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     async function load() {
-      const [stagesData, dealsData] = await Promise.all([
+      const [stagesData, dealsData, usersData] = await Promise.all([
         getStages(),
         getDeals(),
+        getUsers(),
       ]);
       setStages(stagesData);
       setDeals(dealsData);
+      setUsers(usersData);
       
       const today = new Date();
       const monthAgo = new Date(today);
@@ -196,6 +199,34 @@ export default function StatsPage() {
             })}
           </div>
         </div>
+
+        {users.length > 0 && (
+          <div className="bg-[#1a1a1a] rounded-lg p-6 border border-[#2a2a2a]">
+            <h2 className="text-lg font-semibold text-white mb-4">Leads per User</h2>
+            <div className="space-y-3">
+              {users.map((user) => {
+                const userDeals = filteredDeals.filter(d => d.userId === user.id);
+                const userWon = userDeals.filter(d => {
+                  const stage = stages.find(s => s.id === d.stageId);
+                  return stage?.name === "Won";
+                });
+                return (
+                  <div key={user.id} className="flex items-center gap-3">
+                    <span className="w-32 text-white font-medium">{user.name}</span>
+                    <div className="flex-1 h-2 bg-[#252525] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#8b5cf6]"
+                        style={{ width: `${totalDeals > 0 ? (userDeals.length / totalDeals) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <span className="w-12 text-right text-[#a1a1a1]">{userDeals.length}</span>
+                    <span className="w-16 text-right text-[#22c55e]">won: {userWon.length}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

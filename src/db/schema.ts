@@ -1,5 +1,13 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  role: text("role").notNull().default("user"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});
+
 export const stages = sqliteTable("stages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -17,6 +25,7 @@ export const deals = sqliteTable("deals", {
   description: text("description"),
   tags: text("tags"),
   stageId: integer("stage_id").notNull().references(() => stages.id),
+  userId: integer("user_id").references(() => users.id),
   order: integer("order").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
@@ -29,13 +38,5 @@ export const attachments = sqliteTable("attachments", {
   fileUrl: text("file_url").notNull(),
   fileType: text("file_type"),
   fileSize: integer("file_size"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
-});
-
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  role: text("role").notNull().default("user"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });

@@ -36,6 +36,7 @@ export async function createDeal(data: {
   amount?: number;
   description?: string;
   stageId: number;
+  userId?: number;
 }) {
   const now = new Date();
   const [deal] = await db
@@ -47,6 +48,7 @@ export async function createDeal(data: {
       amount: data.amount,
       description: data.description,
       stageId: data.stageId,
+      userId: data.userId,
       createdAt: now,
       updatedAt: now,
     })
@@ -63,6 +65,7 @@ export async function updateDeal(
     amount?: number;
     description?: string;
     stageId?: number;
+    userId?: number;
     order?: number;
   }
 ) {

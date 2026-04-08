@@ -177,6 +177,7 @@ export default function Home() {
       {showModal && (
         <NewDealModal
           stages={stages}
+          users={users}
           onClose={() => setShowModal(false)}
           onSuccess={refreshData}
         />
@@ -186,6 +187,7 @@ export default function Home() {
         <EditDealModal
           deal={editingDeal}
           stages={stages}
+          users={users}
           onClose={() => setEditingDeal(null)}
           onSuccess={refreshData}
         />
