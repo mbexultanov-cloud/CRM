@@ -12,6 +12,15 @@ CRM-система для управления воронкой продаж с 
 - [x] Multi-user account switching with filtering
 - [x] Time-based deal filtering (today/week/month/year)
 - [x] Provider system for multi-tenant CRM (providers, users, deals, stages per provider)
+- [x] WhatsApp Business API integration:
+  - Table `whatsapp_messages` in DB schema (migration 0007)
+  - Webhook endpoint `GET/POST /api/whatsapp/webhook` for Meta verification and incoming messages
+  - Send endpoint `POST /api/whatsapp/send`
+  - Server actions: `getWhatsAppMessages`, `sendWhatsAppMessage`, `getAllWhatsAppChats`, `getWhatsAppMessagesByPhone`
+  - `WhatsAppChat` component — popup chat window tied to a deal
+  - `/whatsapp` page — full chat list with split-pane layout
+  - WhatsApp button in EditDealModal header
+  - WhatsApp link in main CRM header
 
 ## Current Structure
 
@@ -83,3 +92,4 @@ export async function GET() {
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
+| 2026-04-22 | WhatsApp Business API integration added |

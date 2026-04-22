@@ -52,3 +52,18 @@ export const attachments = sqliteTable("attachments", {
   fileSize: integer("file_size"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
+
+// direction: "inbound" | "outbound"
+// status: "sent" | "delivered" | "read" | "failed"
+export const whatsappMessages = sqliteTable("whatsapp_messages", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  dealId: integer("deal_id").references(() => deals.id),
+  waMessageId: text("wa_message_id").unique(), // WhatsApp message ID
+  from: text("from").notNull(),               // phone number sender
+  to: text("to").notNull(),                   // phone number recipient
+  body: text("body").notNull(),
+  direction: text("direction").notNull().default("outbound"), // "inbound" | "outbound"
+  status: text("status").notNull().default("sent"),           // "sent" | "delivered" | "read" | "failed"
+  timestamp: integer("timestamp", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+});

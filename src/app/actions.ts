@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { deals, stages, attachments, users, providers } from "@/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { deals, stages, attachments, users, providers, whatsappMessages } from "@/db/schema";
+import { eq, asc, desc, or } from "drizzle-orm";
 
 export async function getProviders() {
   return db.select().from(providers);
@@ -164,4 +164,98 @@ export async function createAttachment(data: {
 
 export async function deleteAttachment(id: number) {
   await db.delete(attachments).where(eq(attachments.id, id));
+}
+
+// ===== WhatsApp Messages =====
+
+export async function getWhatsAppMessages(dealId: number) {
+  return db
+    .select()
+    .from(whatsappMessages)
+    .where(eq(whatsappMessages.dealId, dealId))
+    .orderBy(asc(whatsappMessages.timestamp));
+}
+
+export async function getAllWhatsAppChats() {
+  // Возвращаем последнее сообщение для каждой уникальной пары (deal_id, from/to)
+  // Получаем все сообщения, сгруппированные по deal_id
+  const messages = await db
+    .select()
+    .from(whatsappMessages)
+    .orderBy(desc(whatsappMessages.timestamp));
+
+  // Группируем по dealId (или по номеру телефона для входящих без сделки)
+  const chats = new Map<string, typeof messages[0]>();
+  for (const msg of messages) {
+    const key = msg.dealId ? `deal_${msg.dealId}` : `phone_${msg.direction === "inbound" ? msg.from : msg.to}`;
+    if (!chats.has(key)) {
+      chats.set(key, msg);
+    }
+  }
+
+  return Array.from(chats.values());
+}
+
+export async function sendWhatsAppMessage(data: {
+  to: string;
+  body: string;
+  dealId?: number;
+}) {
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+
+  if (!phoneNumberId || !accessToken) {
+    throw new Error("WhatsApp не настроен. Добавьте WHATSAPP_PHONE_NUMBER_ID и WHATSAPP_ACCESS_TOKEN в .env.local");
+  }
+
+  const response = await fetch(
+    `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to: data.to,
+        type: "text",
+        text: { body: data.body },
+      }),
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result?.error?.message || "Failed to send WhatsApp message");
+  }
+
+  const waMessageId = result?.messages?.[0]?.id;
+
+  const [saved] = await db.insert(whatsappMessages).values({
+    dealId: data.dealId ?? null,
+    waMessageId: waMessageId ?? null,
+    from: phoneNumberId,
+    to: data.to,
+    body: data.body,
+    direction: "outbound",
+    status: "sent",
+    timestamp: new Date(),
+  }).returning();
+
+  return saved;
+}
+
+export async function getWhatsAppMessagesByPhone(phone: string) {
+  return db
+    .select()
+    .from(whatsappMessages)
+    .where(
+      or(
+        eq(whatsappMessages.from, phone),
+        eq(whatsappMessages.to, phone)
+      )
+    )
+    .orderBy(asc(whatsappMessages.timestamp));
 }
