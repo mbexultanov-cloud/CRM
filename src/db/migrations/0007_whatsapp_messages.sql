@@ -1,4 +1,4 @@
-CREATE TABLE `whatsapp_messages` (
+CREATE TABLE IF NOT EXISTS `whatsapp_messages` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`deal_id` integer,
 	`wa_message_id` text,
@@ -12,4 +12,4 @@ CREATE TABLE `whatsapp_messages` (
 	FOREIGN KEY (`deal_id`) REFERENCES `deals`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `whatsapp_messages_wa_message_id_unique` ON `whatsapp_messages` (`wa_message_id`);
+CREATE UNIQUE INDEX IF NOT EXISTS `whatsapp_messages_wa_message_id_unique` ON `whatsapp_messages` (`wa_message_id`);
