@@ -1,19 +1,17 @@
-# Active Context: Next.js Starter Template
+# Active Context: CRM Kanban Application
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Project Status**: ✅ Active - CRM Kanban with multi-user support
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+CRM-система для управления воронкой продаж с поддержкой нескольких пользователей.
 
 ## Recently Completed
 
-- [x] Base Next.js 16 setup with App Router
-- [x] TypeScript configuration with strict mode
-- [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
+- [x] Base CRM Kanban setup (deals, stages, users, attachments)
+- [x] Multi-user account switching with filtering
+- [x] Time-based deal filtering (today/week/month/year)
+- [x] Provider system for multi-tenant CRM (providers, users, deals, stages per provider)
 
 ## Current Structure
 

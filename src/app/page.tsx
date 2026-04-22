@@ -1,43 +1,53 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Stage, Deal, User } from "@/app/types";
-import { getStages, getDeals, getUsers } from "@/app/actions";
+import { Stage, Deal, User, Provider } from "@/app/types";
+import { getStages, getDeals, getUsers, getProviders } from "@/app/actions";
 import { KanbanBoard } from "./components/kanban/KanbanBoard";
 import { CalendarView } from "./components/kanban/CalendarView";
 import { NewDealModal } from "./components/kanban/NewDealModal";
 import { EditDealModal } from "./components/kanban/EditDealModal";
 import { StageManager } from "./components/kanban/StageManager";
 import { UserManager } from "./components/kanban/UserManager";
+import { ProviderManager } from "./components/kanban/ProviderManager";
 
 export default function Home() {
   const [stages, setStages] = useState<Stage[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [timeFilter, setTimeFilter] = useState<string>("all");
   const [showStages, setShowStages] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [showProviders, setShowProviders] = useState(false);
   const [viewMode, setViewMode] = useState<"kanban" | "calendar">("kanban");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [currentProviderId, setCurrentProviderId] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
-      const [stagesData, dealsData, usersData] = await Promise.all([
-        getStages(),
-        getDeals(),
-        getUsers(),
+      const [stagesData, dealsData, usersData, providersData] = await Promise.all([
+        getStages(currentProviderId ?? undefined),
+        getDeals(currentProviderId ?? undefined),
+        getUsers(currentProviderId ?? undefined),
+        getProviders(),
       ]);
       setStages(stagesData);
       setDeals(dealsData);
       setUsers(usersData);
+      setProviders(providersData);
       setLoading(false);
     }
     load();
-  }, []);
+  }, [currentProviderId]);
 
   const filteredDeals = deals.filter((deal) => {
+    if (currentProviderId !== null && deal.providerId !== currentProviderId) return false;
+    if (currentUserId !== null && deal.userId !== currentUserId) return false;
+    
     if (timeFilter === "all") return true;
     
     const dealDate = deal.createdAt ? new Date(deal.createdAt) : null;
@@ -67,14 +77,16 @@ export default function Home() {
   });
 
   const refreshData = async () => {
-    const [stagesData, dealsData, usersData] = await Promise.all([
-      getStages(),
-      getDeals(),
-      getUsers(),
+    const [stagesData, dealsData, usersData, providersData] = await Promise.all([
+      getStages(currentProviderId ?? undefined),
+      getDeals(currentProviderId ?? undefined),
+      getUsers(currentProviderId ?? undefined),
+      getProviders(),
     ]);
     setStages(stagesData);
     setDeals(dealsData);
     setUsers(usersData);
+    setProviders(providersData);
   };
 
   if (loading) {
@@ -108,6 +120,30 @@ export default function Home() {
             <h1 className="text-xl font-bold text-white">CRM Kanban</h1>
           </div>
           <div className="flex items-center gap-3">
+            <select
+              value={currentProviderId ?? ""}
+              onChange={(e) => setCurrentProviderId(e.target.value ? Number(e.target.value) : null)}
+              className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-white text-sm"
+            >
+              <option value="">All providers</option>
+              {providers.map((provider) => (
+                <option key={provider.id} value={provider.id}>
+                  {provider.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={currentUserId ?? ""}
+              onChange={(e) => setCurrentUserId(e.target.value ? Number(e.target.value) : null)}
+              className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-white text-sm"
+            >
+              <option value="">All users</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
@@ -152,6 +188,12 @@ export default function Home() {
               Users ({users.length})
             </button>
             <button
+              onClick={() => setShowProviders(!showProviders)}
+              className="rounded-lg bg-[#f59e0b] px-4 py-2 text-white font-medium"
+            >
+              Providers ({providers.length})
+            </button>
+            <button
               onClick={() => setShowModal(true)}
               className="rounded-lg bg-[#22c55e] px-4 py-2 font-medium text-white hover:bg-[#16a34a]"
             >
@@ -170,6 +212,11 @@ export default function Home() {
         {showUsers && (
           <div className="mb-6 p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
             <UserManager users={users} onUpdate={refreshData} />
+          </div>
+        )}
+        {showProviders && (
+          <div className="mb-6 p-4 bg-[#1a1a1a] rounded-lg border border-[#2a2a2a]">
+            <ProviderManager providers={providers} onUpdate={refreshData} />
           </div>
         )}
         {stages.length === 0 ? (

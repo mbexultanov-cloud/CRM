@@ -1,26 +1,53 @@
 "use server";
 
 import { db } from "@/db";
-import { deals, stages, attachments, users } from "@/db/schema";
+import { deals, stages, attachments, users, providers } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
-export async function getStages() {
+export async function getProviders() {
+  return db.select().from(providers);
+}
+
+export async function createProvider(data: { name: string; email: string; phone?: string }) {
+  const [provider] = await db.insert(providers).values({
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+  }).returning();
+  return provider;
+}
+
+export async function deleteProvider(id: number) {
+  await db.delete(providers).where(eq(providers.id, id));
+}
+
+export async function getStages(providerId?: number) {
+  if (providerId) {
+    return db.select().from(stages).where(eq(stages.providerId, providerId)).orderBy(asc(stages.order));
+  }
   return db.select().from(stages).orderBy(asc(stages.order));
 }
 
-export async function getDeals() {
+export async function getDeals(providerId?: number) {
+  if (providerId) {
+    return db.select().from(deals).where(eq(deals.providerId, providerId)).orderBy(asc(deals.order));
+  }
   return db.select().from(deals).orderBy(asc(deals.order));
 }
 
-export async function getUsers() {
+export async function getUsers(providerId?: number) {
+  if (providerId) {
+    return db.select().from(users).where(eq(users.providerId, providerId));
+  }
   return db.select().from(users);
 }
 
-export async function createUser(data: { name: string; email: string; role?: string }) {
+export async function createUser(data: { name: string; email: string; role?: string; providerId?: number }) {
   const [user] = await db.insert(users).values({
     name: data.name,
     email: data.email,
     role: data.role || "user",
+    providerId: data.providerId,
   }).returning();
   return user;
 }
@@ -37,6 +64,7 @@ export async function createDeal(data: {
   description?: string;
   stageId: number;
   userId?: number;
+  providerId?: number;
   dueDate?: Date;
 }) {
   const now = new Date();
@@ -50,6 +78,7 @@ export async function createDeal(data: {
       description: data.description,
       stageId: data.stageId,
       userId: data.userId,
+      providerId: data.providerId,
       dueDate: data.dueDate,
       createdAt: now,
       updatedAt: now,
@@ -68,6 +97,7 @@ export async function updateDeal(
     description?: string;
     stageId?: number;
     userId?: number;
+    providerId?: number;
     dueDate?: Date | null;
     order?: number;
   }
